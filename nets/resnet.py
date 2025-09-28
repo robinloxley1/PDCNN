@@ -1,8 +1,8 @@
-from keras import backend as K
-from keras.engine import Layer
-from keras.initializers import random_normal
-from keras.layers import Activation, BatchNormalization, Conv2D
-import keras
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.initializers import random_normal
+from tensorflow.keras.layers import Activation, BatchNormalization, Conv2D
+import tensorflow.keras as keras
 
 
 def Backbone(inputs):
@@ -94,9 +94,9 @@ def Backbone(inputs):
 
 
 
-class ResidualBlock(object):
+class ResidualBlock(Layer):
     def __init__(self, input_dim, filters_1, filters_2, bn, gn, af, name=''):
-        super(ResidualBlock, self).__init__()
+        super().__init__()
         self.conv1 = Conv2dUnit(input_dim, filters_1, 1, stride=1, bias_attr=False, bn=bn, gn=gn, af=af, act='mish', name=name+'.conv1')
         self.conv2 = Conv2dUnit(filters_1, filters_2, 3, stride=1, bias_attr=False, bn=bn, gn=gn, af=af, act='mish', name=name+'.conv2')
 
@@ -112,9 +112,9 @@ class ResidualBlock(object):
         self.conv2.freeze()
 
 
-class StackResidualBlock(object):
+class StackResidualBlock(Layer):
     def __init__(self, input_dim, filters_1, filters_2, n, bn, gn, af, name=''):
-        super(StackResidualBlock, self).__init__()
+        super().__init__()
         self.sequential = []
         for i in range(n):
             residual_block = ResidualBlock(input_dim, filters_1, filters_2, bn, gn, af, name=name+'.block%d' % (i,))
@@ -129,7 +129,7 @@ class StackResidualBlock(object):
         for residual_block in self.sequential:
             residual_block.freeze()
 
-class Conv2dUnit(object):
+class Conv2dUnit(Layer):
     def __init__(self,
                  input_dim,
                  filters,
@@ -146,7 +146,7 @@ class Conv2dUnit(object):
                  norm_decay=0.,
                  use_dcn=False,
                  name=''):
-        super(Conv2dUnit, self).__init__()
+        super().__init__()
         self.input_dim = input_dim
         self.filters = filters
         self.filter_size = filter_size
@@ -198,7 +198,7 @@ class Conv2dUnit(object):
         if act == 'relu':
             self.act = keras.layers.ReLU()
         elif act == 'leaky':
-            self.act = keras.layers.advanced_activations.LeakyReLU(alpha=0.1)
+            self.act = keras.layers. LeakyReLU(negative_slope=0.1)
 
         elif act == 'mish':
             self.act = Mish()
@@ -224,7 +224,7 @@ class Conv2dUnit(object):
 
 class Mish(Layer):
     def __init__(self):
-        super(Mish, self).__init__()
+        super().__init__()
     def compute_output_shape(self, input_shape):
         return input_shape
     def call(self, x):

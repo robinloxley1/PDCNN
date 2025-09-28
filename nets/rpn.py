@@ -1,9 +1,9 @@
-from keras.initializers import random_normal
+from tensorflow.keras.initializers import random_normal
 import tensorflow as tf
 
-from keras.layers import Activation, BatchNormalization, Conv2D,MaxPooling2D
+from tensorflow.keras.layers import Activation, BatchNormalization, Conv2D,MaxPooling2D
 
-from keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 
 
 def outhead(x):
@@ -54,7 +54,7 @@ def decode(hm, wh, reg, max_objects=36):
     length = tf.shape(wh)[1]
     batch_idx = tf.expand_dims(tf.range(0, b), 1)
     batch_idx = tf.tile(batch_idx, (1, max_objects))
-    full_indices = tf.reshape(batch_idx, [-1]) * tf.to_int32(length) + tf.reshape(indices, [-1])
+    full_indices = tf.reshape(batch_idx, [-1]) * tf.cast(length, tf.int32) + tf.reshape(indices, [-1])
     topk_reg = tf.gather(tf.reshape(reg, [-1, 2]), full_indices)
     topk_reg = tf.reshape(topk_reg, [b, -1, 2])
     topk_wh = tf.gather(tf.reshape(wh, [-1, 2]), full_indices)

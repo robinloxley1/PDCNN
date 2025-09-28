@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     dir_origin_path = "img/"
     dir_save_path   = "img_out/"
-    img_name = '1.jpg'
+    img_name = 'perio_3010.tif_0.png'
 
     image_path = os.path.join(dir_origin_path, img_name)
     image = Image.open(image_path)

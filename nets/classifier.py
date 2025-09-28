@@ -1,9 +1,9 @@
-import keras.backend as K
+import tensorflow.keras.backend as K
 import tensorflow as tf
-from keras.engine.topology import Layer
-from keras.initializers import random_normal
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.initializers import random_normal
 
-from keras.layers import (Dense, Flatten, Activation, BatchNormalization, Conv2D,
+from tensorflow.keras.layers import (Dense, Flatten, Activation, BatchNormalization, Conv2D,
                           Add, AveragePooling2D, TimeDistributed)
 
 
@@ -12,15 +12,15 @@ class RoiPoolingConv(Layer):
 
         self.pool_size = pool_size
 
-        super(RoiPoolingConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         self.nb_channels = input_shape[0][3]
 
     def compute_output_shape(self, input_shape):
         input_shape2 = input_shape[1]
-        return None, input_shape2[1], self.pool_size, self.pool_size, self.nb_channels
-    def call(self, x, mask=None):
+        return tf.TensorShape([input_shape2[0], input_shape2[1], self.pool_size, self.pool_size, self.nb_channels])
+    def call(self, x):
         assert(len(x) == 2)
         feature_map = x[0]
         rois        = x[1]
@@ -30,7 +30,7 @@ class RoiPoolingConv(Layer):
         box_index   = tf.tile(box_index, (1, num_rois))
         box_index   = tf.reshape(box_index, [-1])
         rs          = tf.image.crop_and_resize(feature_map, tf.reshape(rois, [-1, 4]), box_index, (self.pool_size, self.pool_size))
-        final_output = K.reshape(rs, (batch_size, num_rois, self.pool_size, self.pool_size, self.nb_channels))
+        final_output = tf.reshape(rs, (batch_size, num_rois, self.pool_size, self.pool_size, self.nb_channels))
         return final_output
 
 def get_resnet50_classifier(base_layers, input_rois, roi_size, num_classes):

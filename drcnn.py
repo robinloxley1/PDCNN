@@ -2,7 +2,7 @@ import colorsys
 import os
 
 import numpy as np
-from keras.applications.imagenet_utils import preprocess_input
+from tensorflow.keras.applications.imagenet_utils import preprocess_input
 from PIL import Image
 
 import nets.model as model
@@ -21,7 +21,7 @@ import cv2
 
 class DRCNN(object):
     _defaults = {
-        "model_path"    : 'model_data/model.h5',
+        "model_path"    : 'model_data/S8_bestmodel.h5',
         "classes_path"  : 'model_data/classes.txt',
         "backbone"      : "resnet50",
         "confidence"    : 0.3,
@@ -55,7 +55,7 @@ class DRCNN(object):
     def generate(self):
         model_path = os.path.expanduser(self.model_path)
         assert model_path.endswith('.h5'), 'Keras model or weights must be a .h5 file.'
-        self.model_rpn, self.model_classifier = model.get_predict_model(self.num_classes, self.backbone)
+        self.model_rpn, self.model_classifier = model.get_predict_model(self.num_classes)
         self.model_rpn.load_weights(self.model_path, by_name=True)
         self.model_classifier.load_weights(self.model_path, by_name=True)
         print('{} model, anchors, and classes loaded.'.format(model_path))
@@ -108,7 +108,7 @@ def drawpre(image, boxes, scores, classes):
     num_classes = 4
     all_classes = ['I','II','III','IV']
 
-    image_h, image_w, _ = image.shape
+    image_h, image_w, = image.shape
 
     hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes)]
     colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))

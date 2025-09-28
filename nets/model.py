@@ -1,6 +1,6 @@
 
-from keras.models import Model
-from keras.layers import Input, Lambda
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Lambda
 
 from nets.classifier import get_resnet50_classifier
 from nets.resnet import Backbone
@@ -45,7 +45,11 @@ def get_predict_model(num_classes):
         yinput = Input(shape=(None, None, None))
         base_layers, y = Backbone(inputs)
         y1, y2, y3 = outhead(base_layers)
-        rpn = Lambda(lambda x: decode(*x, max_objects=36), name='rpn')([y1, y2, y3])
+        rpn = Lambda(lambda x: decode(*x, max_objects=36),
+                    output_shape=(36, 5),   
+                    name='rpn'
+                   )([y1, y2, y3])
+
         if not USEFM:
             y=inputs
         classifier  = get_resnet50_classifier(y, roi_input, ROISIZE, num_classes)
